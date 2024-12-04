@@ -5,7 +5,7 @@ TARGET = Central_tech
 CC = gcc
 
 # Options de compilation
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -g
 
 # Liste des fichiers source
 SOURCES = main.c
@@ -29,7 +29,7 @@ $(TARGET): $(OBJECTS)
 # Règle de nettoyage des fichiers objets et du programme
 clean:
 	rm -f $(OBJECTS) $(TARGET)
-
+#poubiou
 .PHONY: build
 build: $(TARGET)
 

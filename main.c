@@ -6,6 +6,8 @@
 #include <stdlib.h>
 
 int main(){
-  printf("Hello World\n");
-  return 0;
+    int a = 0;
+    int b= 0;
+    printf("Hello World\n");
+    return 0;
 }
