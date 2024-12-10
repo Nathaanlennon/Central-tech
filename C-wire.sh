@@ -56,3 +56,44 @@ if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     h
     exit
 fi
+
+if ! [ -x main ]; then 
+    echo "L'executable C n'existe pas, compilation en cours..."
+    gcc -o main main.c
+    if [ $? -ne 0 ]; then
+        echo "Erreur : Échec de la compilation de l'executable"
+        exit 1
+    else
+        echo "Compilation réussie."
+    fi
+fi
+
+echo "Exécution du programme..."
+./main "$@"
+
+
+if [ -d tmp ]; then
+    echo "Le dossier tmp existe"
+    if [ "$(ls -A tmp)" ]; then
+        echo "rénitialisation du dossier..."
+        rm -r tmp/*
+    else
+        echo "le dossier est déjà vide"
+    fi
+else
+    echo "Création du dossier tmp..."
+    mkdir tmp
+fi
+
+if [ -d graph ]; then
+    echo "Le dossier graph existe"
+    if [ "$(ls -A graph)" ]; then
+        echo "rénitialisation du dossier..."
+        rm -r graph/*
+    else
+        echo "le dossier est déjà vide"
+    fi
+else
+    echo "Création du dossier graph..."
+    mkdir graph
+fi
