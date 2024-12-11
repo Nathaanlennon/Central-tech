@@ -3,7 +3,8 @@
 param_present=0
 
 h () {
-    echo "L'ordre des paramètre est :
+    echo "
+    L'ordre des paramètre est :
     1 : Chemin du fichier ( Obligatoire )
     2 : Type de station à traiter ( Obligatoire )
         Valeurs possibles :
@@ -22,7 +23,10 @@ h () {
                 - hva indiv
     4 : Identifiant de centrale ( Optionnel ) :
                 -> Filtre les résultats pour une centrale spécifique 
-            "
+    
+    Exemple : bash C-wire.sh c-wire_v00.dat hvb comp 1
+    "
+       
 }
 
 for arg in "$@"; do
@@ -33,7 +37,7 @@ for arg in "$@"; do
     fi
 done
 
-if [ -z $1 ]; then
+if [ ! -f $1 ]; then
     echo "Erreur : le chemin n'est pas donné"
     h 
     exit
@@ -56,6 +60,32 @@ if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     h
     exit
 fi
+
+typestation=0
+
+if [ $2 == "hvb" ]; then
+	typestation=2;
+fi
+
+if [ $2 == "hva" ]; then
+	typestation=3;
+fi
+
+if [ $2 == "lv" ]; then
+	typestation=4;
+fi
+
+if [ $3 == "all" ]; then
+	typeconso=0;
+fi
+
+if [ $3 == "comp" ]; then
+	typeconso=5;
+fi
+
+if [ $3 == "indiv" ]; then
+	typeconso=6;
+fi 
 
 if ! [ -x main ]; then 
     echo "L'executable C n'existe pas, compilation en cours..."
@@ -97,3 +127,18 @@ else
     echo "Création du dossier graph..."
     mkdir graph
 fi
+
+echo "Filtrage des données en cours..."
+
+if [ $3 == all ]; then
+	echo "cou"
+else
+	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
+	awk -F';' -v col="$typeconso" '$col != "-" {print $0}' tmp/temp.dat > tmp/input.dat
+fi
+
+
+
+
+
+
