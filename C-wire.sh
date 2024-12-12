@@ -24,7 +24,7 @@ h () {
     4 : Identifiant de centrale ( Optionnel ) :
                 -> Filtre les résultats pour une centrale spécifique 
     
-    Exemple : bash C-wire.sh c-wire_v00.dat hvb comp 1
+    \033[32mExemple : bash C-wire.sh c-wire_v00.dat hvb comp 1\033[0m
     "
        
 }
@@ -87,19 +87,7 @@ if [ $3 == "indiv" ]; then
 	typeconso=6;
 fi 
 
-if ! [ -x main ]; then 
-    echo "L'executable C n'existe pas, compilation en cours..."
-    gcc -o main main.c
-    if [ $? -ne 0 ]; then
-        echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
-        exit 1
-    else
-        echo "Compilation réussie."
-    fi
-fi
 
-echo "Exécution du programme..."
-./main "$@"
 
 
 if [ -d tmp ]; then
@@ -150,7 +138,19 @@ else
 
 fi
 
+if ! [ -x main ]; then 
+    echo "L'executable C n'existe pas, compilation en cours..."
+    gcc -o main main.c
+    if [ $? -ne 0 ]; then
+        echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
+        exit 1
+    else
+        echo "Compilation réussie."
+    fi
+fi
 
+echo "Exécution du programme..."
+./main "$@"
 
 
 
