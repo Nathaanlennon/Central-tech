@@ -131,10 +131,23 @@ fi
 echo "Filtrage des données en cours..."
 
 if [ $3 == all ]; then
-	echo "cou"
+	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/input.dat
 else
 	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
-	awk -F';' -v col="$typeconso" '$col != "-" {print $0}' tmp/temp.dat > tmp/input.dat
+    	
+    awk -F';' -v col="$typeconso" -v col2="$typestation" '
+{
+    if (col2 != 4) {
+        if ($col != "-" || $(col2 + 1) == "-") {
+            print $0
+        }
+    } else {
+        if ($col != "-" || ($5 == "-" && $6 == "-")) {
+            print $0
+        }
+    }
+}' tmp/temp.dat > tmp/input.dat
+
 fi
 
 
