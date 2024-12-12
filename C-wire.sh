@@ -39,24 +39,28 @@ done
 
 if [ ! -f $1 ]; then
     echo -e "\033[31m Erreur : le chemin n'est pas donné \033[0m"
+    echo "durée du traitement : 0 seconde"
     h 
     exit
 fi
 
 if [[ $2 != "hvb" && $2 != "hva" && $2 != "lv" ]]; then
     echo -e "\033[31mErreur : Type de station invalide\033[0m"
+    echo "durée du traitement : 0 seconde"
     h
     exit 1
 fi
 
 if [[ $3 != "comp" && $3 != "indiv" && $3 != "all" ]]; then
     echo -e "\033[31mErreur : Type de consommateurs invalide\033[0m"
+    echo "durée du traitement : 0 seconde"
     h
     exit 1
 fi
 
 if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     echo -e "\033[31mErreur : Option choisie impossible\033[0m"
+    echo "durée du traitement : 0 seconde"
     h
     exit
 fi
@@ -134,14 +138,15 @@ else
             print $0
         }
     }
-}' tmp/temp.dat > tmp/input.dat
+}' tmp/temp.dat > tmp/temp2.dat
+tr '-' '0' < tmp/temp2.dat > tmp/input.dat
 Intervalle=$(($SECONDS - $Avant))
 echo "Durée du filtrage : $Intervalle secondes"
 fi
 
-if ! [ -x main ]; then 
+if ! [ -x Central_tech ]; then 
     echo "L'executable C n'existe pas, compilation en cours..."
-    gcc -o Makefile
+    make build
     if [ $? -ne 0 ]; then
         echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
         exit 1
@@ -151,7 +156,7 @@ if ! [ -x main ]; then
 fi
 
 echo "Exécution du programme..."
-:''./Makefile "$@"
+make run
 
 
 
