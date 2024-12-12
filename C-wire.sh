@@ -117,7 +117,7 @@ else
 fi
 
 echo "Filtrage des données en cours..."
-
+Avant=$SECONDS
 if [ $3 == all ]; then
 	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/input.dat
 else
@@ -135,12 +135,13 @@ else
         }
     }
 }' tmp/temp.dat > tmp/input.dat
-
+Intervalle=$(($SECONDS - $Avant))
+echo "Durée du filtrage : $Intervalle secondes"
 fi
 
 if ! [ -x main ]; then 
     echo "L'executable C n'existe pas, compilation en cours..."
-    gcc -o main main.c
+    gcc -o Makefile
     if [ $? -ne 0 ]; then
         echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
         exit 1
@@ -150,7 +151,7 @@ if ! [ -x main ]; then
 fi
 
 echo "Exécution du programme..."
-./main "$@"
+:''./Makefile "$@"
 
 
 
