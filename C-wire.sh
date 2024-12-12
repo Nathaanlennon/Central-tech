@@ -3,7 +3,7 @@
 param_present=0
 
 h () {
-    echo "
+    echo -e "
     L'ordre des paramètre est :
     1 : Chemin du fichier ( Obligatoire )
     2 : Type de station à traiter ( Obligatoire )
@@ -16,7 +16,7 @@ h () {
                 - comp  ( entreprises )
                 - indiv ( particuliers )
                 - all   ( tous )
-        ATTENTION : Options suivantes interdites car les stations HV-A et HV-B sont exclusives aux entreprises :
+        \033[31mATTENTION : Options suivantes interdites car les stations HV-A et HV-B sont exclusives aux entreprises :\033[0m
                 - hbv all
                 - hvb indiv
                 - hva all
@@ -38,25 +38,25 @@ for arg in "$@"; do
 done
 
 if [ ! -f $1 ]; then
-    echo "Erreur : le chemin n'est pas donné"
+    echo -e "\033[31m Erreur : le chemin n'est pas donné \033[0m"
     h 
     exit
 fi
 
 if [[ $2 != "hvb" && $2 != "hva" && $2 != "lv" ]]; then
-    echo "Erreur : Type de station invalide"
+    echo -e "\033[31mErreur : Type de station invalide\033[0m"
     h
     exit 1
 fi
 
 if [[ $3 != "comp" && $3 != "indiv" && $3 != "all" ]]; then
-    echo "Erreur : Type de consommateurs invalide"
+    echo -e "\033[31mErreur : Type de consommateurs invalide\033[0m"
     h
     exit 1
 fi
 
 if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
-    echo "Erreur : Option choisie impossible"
+    echo -e "\033[31mErreur : Option choisie impossible\033[0m"
     h
     exit
 fi
@@ -91,7 +91,7 @@ if ! [ -x main ]; then
     echo "L'executable C n'existe pas, compilation en cours..."
     gcc -o main main.c
     if [ $? -ne 0 ]; then
-        echo "Erreur : Échec de la compilation de l'executable"
+        echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
         exit 1
     else
         echo "Compilation réussie."
