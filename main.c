@@ -12,6 +12,7 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+//TODO: modifier la strucutre avl pour integrer la struct station
 typedef struct avl_struct {
     int value; // La valeur du nœud
     int eq; // Facteur d'équilibre (balance factor)
@@ -19,7 +20,14 @@ typedef struct avl_struct {
     struct avl_struct *fd; // Pointeur vers le fils droit
 } AVL, *pAVL;
 
+typedef struct Station {
+    int id;
+    int type; // TODO: préparer un enum pour le type ou juste le mettre en commentaire
+    long capacité;
+    long conso; // TODO: réparer
+} Station, *pStation;
 
+//TODO: refaire la fonction init
 pAVL creerAVL(int e) {
     // Alloue de la mémoire pour un nouveau nœud
     pAVL new = (pAVL) malloc(sizeof(AVL));
@@ -215,11 +223,11 @@ int main() {
 
     fichier = fopen("tmp/input.dat", "r");
     if (fichier != NULL) {
-        int chaine[8];
-        fscanf(fichier, "%d;%d;%d;%d;%d;%d;%d;%d", chaine[0], chaine[1], chaine[2], chaine[3], chaine[4], chaine[5],
-               chaine[6], chaine[7]);
-        for (int i = 0;i<8;i++) {
-            printf("%d ", chaine[i]);
+        long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
+               &chaine[5], &chaine[6], &chaine[7]);
+        for (int i = 0; i < 8; i++) {
+            printf("%ld ", chaine[i]);
         }
         fclose(fichier);
     } else {
