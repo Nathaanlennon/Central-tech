@@ -65,6 +65,7 @@ if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     exit
 fi
 
+
 typestation=0
 
 if [ $2 == "hvb" ]; then
@@ -90,6 +91,27 @@ fi
 if [ $3 == "indiv" ]; then
 	typeconso=6;
 fi 
+
+if [ -z $4 ]; then
+    centrale=0;
+else 
+    if [[ $4 == +([0-9]) ]]; then
+        premierElem=$(awk -F';' 'NR==2 {print $1}' "$1")
+        dernierElem=$(awk -F';' 'END {print $1}' "$1")
+        if [ "$4" -lt "$premierElem" ] || [ "$4" -gt "$dernierElem" ]; then
+            echo -e "\033[31mCentrale non existante\033[0m"
+            h
+            exit
+        else
+            centrale=1;
+            echo "$centrale"
+        fi
+    else 
+        echo -e "\033[31mLe numéro de station doit être un entier\033[0m"
+        h
+        exit
+    fi
+fi
 
 
 
@@ -122,25 +144,49 @@ fi
 
 echo "Filtrage des données en cours..."
 Avant=$SECONDS
-if [ $3 == all ]; then
-	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp2.dat
-else
-	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
+sed -i '1d' $1
+if [ "$centrale" -eq 0 ]; then 
+    if [ "$3" == "all" ]; then
+	    awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp2.dat
+    else
+	    awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
     	
-    awk -F';' -v col="$typeconso" -v col2="$typestation" '
-{
-    if (col2 != 4) {
-        if ($col != "-" || $(col2 + 1) == "-") {
-            print $0
+        awk -F';' -v col="$typeconso" -v col2="$typestation" '
+    {
+        if (col2 != 4) {
+            if ($col != "-" || $(col2 + 1) == "-") {
+                print $0
+            }
+        } else {
+            if ($col != "-" || ($5 == "-" && $6 == "-")) {
+                print $0
+            }
         }
-    } else {
-        if ($col != "-" || ($5 == "-" && $6 == "-")) {
-            print $0
-        }
-    }
-}' tmp/temp.dat > tmp/temp2.dat
+    }' tmp/temp.dat > tmp/temp2.dat
+    fi
+else 
+    awk -F';' -v idcentrale="$4" '$1 == idcentrale {print $0}' "$1" > tmp/temp3.dat
+        if [ ""$3 == "all" ]; then
+	        awk -F';' -v col="$typestation" '$col != "-" {print $0}' tmp/temp3.dat > tmp/temp2.dat
+        else
+	        awk -F';' -v col="$typestation" '$col != "-" {print $0}' tmp/temp3.dat > tmp/temp.dat
+    	
+            awk -F';' -v col="$typeconso" -v col2="$typestation" '
+        {
+            if (col2 != 4) {
+                if ($col != "-" || $(col2 + 1) == "-") {
+                    print $0
+                }
+            } else {
+                if ($col != "-" || ($5 == "-" && $6 == "-")) {
+                    print $0
+                }
+            }
+        }' tmp/temp.dat > tmp/temp2.dat
+    fi
 fi
 tr '-' '0' < tmp/temp2.dat > tmp/input.dat
+
 Intervalle=$(($SECONDS - $Avant))
 echo "Durée du filtrage : $Intervalle secondes"
 
@@ -158,7 +204,3 @@ fi
 
 echo "Exécution du programme..."
 make run
-
-
-
-
