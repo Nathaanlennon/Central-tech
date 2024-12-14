@@ -123,7 +123,10 @@ fi
 echo "Filtrage des données en cours..."
 Avant=$SECONDS
 if [ $3 == all ]; then
-	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/input.dat
+	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp2.dat
+    tr '-' '0' < tmp/temp2.dat > tmp/input.dat
+    Intervalle=$(($SECONDS - $Avant))
+    echo "Durée du filtrage : $Intervalle secondes"
 else
 	awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
     	
