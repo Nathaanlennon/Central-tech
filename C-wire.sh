@@ -107,7 +107,7 @@ else
             echo "$centrale"
         fi
     else 
-        echo -e "\033[31mLe numéro de station doit être un entier\033[0m"
+        echo -e "\033[31mLe numéro de centrale doit être un entier\033[0m"
         h
         exit
     fi
@@ -141,6 +141,13 @@ else
     echo "Création du dossier graph..."
     mkdir graph
 fi
+
+touch hva_comp.csv
+touch hvb_comp.cvs
+touch lv_all.cvs
+touch lv_comp.cvs
+touch lv_indiv.cvs
+
 
 echo "Filtrage des données en cours..."
 Avant=$SECONDS
