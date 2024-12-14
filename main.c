@@ -12,29 +12,73 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-//TODO: modifier la strucutre avl pour integrer la struct station
-typedef struct avl_struct {
-    int value; // La valeur du nœud
-    int eq; // Facteur d'équilibre (balance factor)
-    struct avl_struct *fg; // Pointeur vers le fils gauche
-    struct avl_struct *fd; // Pointeur vers le fils droit
-} AVL, *pAVL;
+enum type_station {DEFAUT, HVB, HVA, LV}; //defaut équivaut à nul, vide, etc
 
 typedef struct Station {
     int id;
-    int type; // TODO: préparer un enum pour le type ou juste le mettre en commentaire
+    int type; // voir enum type_station
     long capacité;
-    long conso; // TODO: réparer
+    long conso;
 } Station, *pStation;
 
-//TODO: refaire la fonction init
-pAVL creerAVL(int e) {
+
+typedef struct AVL {
+    pStation station;
+    int eq; // Facteur d'équilibre (balance factor)
+    struct AVL *fg; // Pointeur vers le fils gauche
+    struct AVL *fd; // Pointeur vers le fils droit
+} AVL, *pAVL;
+
+
+int get_type_station(long chaine[8]) {
+    if (chaine[4] != 0 || chaine[5] !=0) {
+        return DEFAUT;
+    }
+    if (chaine[3]>0) {
+        return LV;
+    }
+    else if (chaine[2]>0) {
+        return HVA;
+    }
+    else if (chaine[1]>0) {
+        return HVB;
+    }
+    else return DEFAUT;
+}
+
+// crée une station en fonction de la chaine associée, renvoie NULL si valeurs incorrectes. Ne s'occupe pas de la consommation
+pStation creer_station(long chaine[8]) {
+    pStation station = malloc(sizeof(Station));
+    int type = get_type_station(chaine);
+    switch (type) {
+        case LV:
+            station->type = LV;
+            station->id = chaine[3];
+            break;
+        case HVA:
+            station->type = HVA;
+            station->id = chaine[2];
+            break;
+        case HVB:
+            station->type = HVB;
+            station->id = chaine[1];
+            break;
+        case DEFAUT:
+            free(station);
+            return NULL;
+    }
+    station->capacité = chaine[6];
+    return station;
+}
+//TODO: faire la fonction qui traite le fichier (ou mettre dans main si impossible d'en faire une fonction)
+
+pAVL creerAVL(pStation e) {
     // Alloue de la mémoire pour un nouveau nœud
     pAVL new = (pAVL) malloc(sizeof(AVL));
     if (new == NULL) {
         exit(EXIT_FAILURE); // Arrêt immédiat en cas d'erreur d'allocation
     }
-    new->value = e; // Initialisation de la valeur
+    new->station = e; // Initialisation de la valeur
     new->fg = NULL; // Pas de fils gauche
     new->fd = NULL; // Pas de fils droit
     new->eq = 0; // Facteur d'équilibre initialisé à 0
@@ -60,7 +104,7 @@ pAVL rotationDroite(pAVL a) {
     int eq_a = a->eq, eq_p = pivot->eq;
 
     a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de `a`
-    pivot->fd = a; // `a` devient le fils droit du pivot
+    pivot->fd = a; // 'a' devient le fils droit du pivot
 
     // Mise à jour des facteurs d'équilibre
     a->eq = eq_a - MIN(eq_p, 0) + 1;
@@ -98,16 +142,19 @@ pAVL equilibrerAVL(pAVL a) {
     return a; // Aucun rééquilibrage nécessaire
 }
 
-pAVL insertionAVL(pAVL a, int e, int *h) {
+pAVL insertionAVL(pAVL a, pStation e, int *h) {
+    if (e==NULL) {
+        return a;
+    }
     if (a == NULL) {
         // Si l'arbre est vide, crée un nouveau nœud
         *h = 1; // La hauteur a augmenté
         return creerAVL(e);
-    } else if (e < a->value) {
+    } else if (e->id < a->station->id) {
         // Si l'élément est plus petit, insérer à gauche
         a->fg = insertionAVL(a->fg, e, h);
         *h = -*h; // Inverse l'impact de la hauteur
-    } else if (e > a->value) {
+    } else if (e->id > a->station->id) {
         // Si l'élément est plus grand, insérer à droite
         a->fd = insertionAVL(a->fd, e, h);
     } else {
@@ -121,67 +168,6 @@ pAVL insertionAVL(pAVL a, int e, int *h) {
         a->eq += *h;
         a = equilibrerAVL(a);
         *h = (a->eq == 0) ? 0 : 1; // Mise à jour de la hauteur
-    }
-    return a;
-}
-
-pAVL suppMinAVL(pAVL a, int *h, int *pe) {
-    pAVL temp;
-    if (a->fg == NULL) {
-        // Trouvé le plus petit élément
-        *pe = a->value; // Sauvegarde la valeur
-        *h = -1; // Réduction de la hauteur
-        temp = a;
-        a = a->fd; // Le sous-arbre droit devient la racine
-        free(temp);
-        return a;
-    } else {
-        a->fg = suppMinAVL(a->fg, h, pe); // Recherche récursive à gauche
-        *h = -*h;
-    }
-
-    // Mise à jour et rééquilibrage après suppression
-    if (*h != 0) {
-        a->eq += *h;
-        a = equilibrerAVL(a);
-        *h = (a->eq == 0) ? -1 : 0;
-    }
-    return a;
-}
-
-pAVL suppressionAVL(pAVL a, int e, int *h) {
-    pAVL temp;
-    if (a == NULL) {
-        // Élément introuvable
-        *h = 0; //attenttion faute dans le CM
-        return a;
-    }
-    if (e > a->value) {
-        // Recherche dans le sous-arbre droit
-        a->fd = suppressionAVL(a->fd, e, h);
-    } else if (e < a->value) {
-        // Recherche dans le sous-arbre gauche
-        a->fg = suppressionAVL(a->fg, e, h);
-        *h = -*h;
-    } else if (a->fd != NULL) {
-        // Si le nœud a un fils droit
-        a->fd = suppMinAVL(a->fd, h, &(a->value));
-    } else {
-        // Cas du nœud feuille ou avec un seul fils gauche
-        temp = a;
-        a = a->fg;
-        free(temp);
-        *h = -1;
-        return a;
-    }
-    if (a == NULL) {
-        return a;
-    }
-    // Mise à jour et rééquilibrage après suppression
-    if (*h != 0) {
-        a->eq += *h;
-        a = equilibrerAVL(a);
-        *h = (a->eq == 0) ? -1 : 0;
     }
     return a;
 }
@@ -204,7 +190,7 @@ void afficherAVL(pAVL nd, int niveau) {
            "\x1B[0;34m"
            "%d\n"
            "\x1B[0m",
-           nd->value, nd->eq);
+           nd->station->id, nd->eq);
 
     // Affiche ensuite le sous-arbre gauche
     afficherAVL(nd->fg, niveau + 1);
@@ -213,27 +199,36 @@ void afficherAVL(pAVL nd, int niveau) {
 int main() {
     pAVL avl = NULL;
     int hauteur = 0;
-    avl = insertionAVL(avl, 10, &hauteur);
     int balance = 0;
-    avl = insertionAVL(avl, 3, &balance);
-    avl = insertionAVL(avl, 9, &balance);
+
+
+
     afficherAVL(avl, 0);
     printf("Hello World\n");
     FILE *fichier = NULL;
 
     fichier = fopen("tmp/input.dat", "r");
+
     if (fichier != NULL) {
         long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
-               &chaine[5], &chaine[6], &chaine[7]);
-        for (int i = 0; i < 8; i++) {
-            printf("%ld ", chaine[i]);
+        pStation station = NULL;
+        while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
+               &chaine[5], &chaine[6], &chaine[7]) != EOF) {
+            if (get_type_station(chaine) != DEFAUT) {
+                station = creer_station(chaine);
+                avl = insertionAVL(avl, station, &hauteur);
+            }
+            else {
+                station->conso += chaine[7];
+            }
         }
+
         fclose(fichier);
     } else {
         // On affiche un message d'erreur si on veut
         printf("Impossible d'ouvrir le fichier input.dat");
         exit(1);
     }
+    afficherAVL(avl, hauteur);
     return 0;
 }
