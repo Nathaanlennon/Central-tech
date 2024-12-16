@@ -196,6 +196,31 @@ void afficherAVL(pAVL nd, int niveau) {
     afficherAVL(nd->fg, niveau + 1);
 }
 
+void affiche_csv(pAVL a){
+
+    FILE *fichier= NULL;
+
+    if(a->station->type == HVA){
+        fichier = fopen("hva_comp.csv", "w");
+        if(fichier == NULL){
+                exit(1);
+        }
+        fprintf(fichier, "Station HV-A:Capacité:Comsommation(entreprise)\n");
+    }
+    if (a->station->type == HVB) {
+        fichier = fopen("hvb_comp.csv", "w");
+        if(fichier == NULL){
+            exit(1);
+        }fprintf(fichier, "Station HV-B:Capacité:Comsommation(entreprise)\n");
+    }
+    if (a->station->type == LV) {
+        fichier = fopen("lv_comp.csv", "w");
+        if(fichier == NULL){
+            exit(1);
+        }fprintf(fichier, "Station LV:Capacité:Comsommation(entreprise)\n");
+    }
+}
+
 int main() {
     pAVL avl = NULL;
     int hauteur = 0;
@@ -230,5 +255,7 @@ int main() {
         exit(1);
     }
     afficherAVL(avl, hauteur);
+
+    affiche_csv(avl);
     return 0;
 }
