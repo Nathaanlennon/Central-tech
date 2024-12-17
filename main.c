@@ -12,11 +12,11 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-enum type_station {DEFAUT, HVB, HVA, LV}; //defaut équivaut à nul, vide, etc
+enum type_station { DEFAUT, HVB, HVA, LV }; //defaut équivaut à nul, vide, etc
 
 typedef struct Station {
-    int id;
-    int type; // voir enum type_station
+    unsigned int id;
+    unsigned int type; // voir enum type_station
     long capacité;
     long conso;
 } Station, *pStation;
@@ -24,61 +24,68 @@ typedef struct Station {
 
 typedef struct AVL {
     pStation station;
-    int eq; // Facteur d'équilibre (balance factor)
+    int eq; // Facteur d'équilibre
     struct AVL *fg; // Pointeur vers le fils gauche
     struct AVL *fd; // Pointeur vers le fils droit
 } AVL, *pAVL;
 
-
+//Permet d'obtenir le type de la station que l'on crée et le retourne sous la forme d'un int, voir enum type_station
 int get_type_station(long chaine[8]) {
-    if (chaine[4] != 0 || chaine[5] !=0) {
+    if (chaine[4] != 0 || chaine[5] != 0) {
+        //vérifie qu'il s'agit d'une station, retourne le type defaut donc erreur. Il s'agit donc probablement d'un consommateur
         return DEFAUT;
     }
-    if (chaine[3]>0) {
+    if (chaine[3] > 0) {
+        //on commence par lv car les sous stations possèdent quand même l'id de leur station mère
         return LV;
-    }
-    else if (chaine[2]>0) {
+    } else if (chaine[2] > 0) {
+        //même principe
         return HVA;
-    }
-    else if (chaine[1]>0) {
+    } else if (chaine[1] > 0) {
         return HVB;
-    }
-    else return DEFAUT;
+    } else return DEFAUT;
 }
 
 // crée une station en fonction de la chaine associée, renvoie NULL si valeurs incorrectes. Ne s'occupe pas de la consommation
 pStation creer_station(long chaine[8]) {
-    pStation station = malloc(sizeof(Station));
+    pStation station = NULL;
+    station = malloc(sizeof(Station)); //allocation mémoire en fonction de la taille de la structure
     int type = get_type_station(chaine);
     switch (type) {
         case LV:
-            station->type = LV;
-            station->id = chaine[3];
+            station->id = chaine[3]; //récupère l'id dans la colone associée au type (pareil pour chaque cas du switch)
             break;
         case HVA:
-            station->type = HVA;
             station->id = chaine[2];
             break;
         case HVB:
-            station->type = HVB;
             station->id = chaine[1];
             break;
         case DEFAUT:
+        default:
             free(station);
+        //si le type n'est pas dans l'enum ou est en défaut, ce qui veut dire invalide, retourne NULL et libère la mémoire car il ne s'agit pas d'une station
             return NULL;
     }
-    station->capacité = chaine[6];
-    return station;
+    station->type = type; //renseigne le type dans la structure
+    station->capacité = chaine[6]; //récupère la capacité de la station dans sa colone
+    station->conso = 0; //par défaut, la consomation est à 0, car c'est avant calcul
+    return station; //retourne la station
 }
 
-
-pAVL creerAVL(pStation e) {
+//crée un chainon d'avl en prenant en argument une station
+pAVL creerAVL(pStation station) {
+    if (station == NULL) {
+        return NULL;
+        //si la station que l'on doit mettre dans l'avl est nulle, il n'y a aucune raison de creer l'avl donc on retourne null
+    }
     // Alloue de la mémoire pour un nouveau nœud
-    pAVL new = (pAVL) malloc(sizeof(AVL));
+    pAVL new = NULL;
+    new = malloc(sizeof(AVL));
     if (new == NULL) {
         exit(EXIT_FAILURE); // Arrêt immédiat en cas d'erreur d'allocation
     }
-    new->station = e; // Initialisation de la valeur
+    new->station = station; // on intègre la station dans l'avl
     new->fg = NULL; // Pas de fils gauche
     new->fd = NULL; // Pas de fils droit
     new->eq = 0; // Facteur d'équilibre initialisé à 0
@@ -89,8 +96,8 @@ pAVL rotationGauche(pAVL a) {
     pAVL pivot = a->fd; // Le fils droit devient le pivot
     int eq_a = a->eq, eq_p = pivot->eq;
 
-    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de `a`
-    pivot->fg = a; // `a` devient le fils gauche du pivot
+    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de 'a'
+    pivot->fg = a; // 'a' devient le fils gauche du pivot
 
     // Mise à jour des facteurs d'équilibre
     a->eq = eq_a - MAX(eq_p, 0) - 1;
@@ -103,7 +110,7 @@ pAVL rotationDroite(pAVL a) {
     pAVL pivot = a->fg; // Le fils gauche devient le pivot
     int eq_a = a->eq, eq_p = pivot->eq;
 
-    a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de `a`
+    a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de 'a'
     pivot->fd = a; // 'a' devient le fils droit du pivot
 
     // Mise à jour des facteurs d'équilibre
@@ -142,21 +149,22 @@ pAVL equilibrerAVL(pAVL a) {
     return a; // Aucun rééquilibrage nécessaire
 }
 
-pAVL insertionAVL(pAVL a, pStation e, int *h) {
-    if (e==NULL) {
+//insere une nouvelle station dans l'avl
+pAVL insertionAVL(pAVL a, pStation station, int *h) {
+    if (station == NULL) {
         return a;
     }
     if (a == NULL) {
         // Si l'arbre est vide, crée un nouveau nœud
         *h = 1; // La hauteur a augmenté
-        return creerAVL(e);
-    } else if (e->id < a->station->id) {
+        return creerAVL(station);
+    } else if (station->id < a->station->id) {
         // Si l'élément est plus petit, insérer à gauche
-        a->fg = insertionAVL(a->fg, e, h);
+        a->fg = insertionAVL(a->fg, station, h);
         *h = -*h; // Inverse l'impact de la hauteur
-    } else if (e->id > a->station->id) {
+    } else if (station->id > a->station->id) {
         // Si l'élément est plus grand, insérer à droite
-        a->fd = insertionAVL(a->fd, e, h);
+        a->fd = insertionAVL(a->fd, station, h);
     } else {
         // Élément déjà présent
         *h = 0;
@@ -196,64 +204,83 @@ void afficherAVL(pAVL nd, int niveau) {
     afficherAVL(nd->fg, niveau + 1);
 }
 
-void free_avl(pAVL avl) {
+// libère tout l'avl
+void liberation_avl(pAVL avl) {
     if (avl == NULL) {
-        return;
+        return; // l'avl est déjà libéré, rien à faire
     }
     if (avl->fd != NULL) {
-        free_avl(avl->fd);
+        liberation_avl(avl->fd); //on libère le sous arbre droit
     }
     if (avl->fg != NULL) {
-        free_avl(avl->fg);
+        liberation_avl(avl->fg); //on libère le sous arbre gauche
     }
-    free(avl);
+    free(avl); //on libère le noeud actuel
 }
 
-pAVL traitement_input(FILE* fichier, pAVL avl, int* hauteur) {
+// TODO: vérifier que les consommateurs sont bien reliés à la station
+// Traite le fichier mis en argument pour le convertir en AVL. L'avl mit en argument doit être nul et la hauteur doit valoir 0, sinon les deux seront réinitialisés
+pAVL traitement_input(FILE *fichier, pAVL avl, int *hauteur) {
     if (fichier == NULL) {
-        return NULL;
+        return NULL; //Si le fichier n'existe pas, rien à convertir en avl
     }
-    if (avl !=NULL) {
-        free_avl(avl);
-        avl = NULL;
+    if (avl != NULL) {
+        //l'avl n'est pas nul
+        liberation_avl(avl); //on vide l'avl
+        avl = NULL; //on le remet à null
+        *hauteur = 0; // et on remet la hauteur à 0
     }
-    long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    pStation station = NULL;
+    long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0}; //initialisation de la chaine de caractère qui prend la ligne actuelle
+    pStation station = NULL; //préparation de la station que l'on va créer
 
-    // TODO: modifier la boucle et la vérification pour éviter de faire e if tation == null à  chaque coup
-    while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
-           &chaine[5], &chaine[6], &chaine[7]) != EOF) {
+    //la première iteration de la boucle est en dehors das le cas où la premièr ligne n'est pas une station, auquel cas on suppose sa station et sa capacité est mise à 0 par défaut
+    if (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
+               &chaine[5], &chaine[6], &chaine[7]) != EOF) { //récupération de la première ligne, eof signifie que le fichier est vide
+        if (get_type_station(chaine) != DEFAUT) { //on vérifie que le type n'est pas incorrect et qu'il s'agit bien d'une station, défaut veut dire que ce n'est pas une station
+            station = creer_station(chaine); //on crée la nouvelle station à partir de la ligne
+            avl = insertionAVL(avl, station, hauteur); //et on intègre la station dans l'AVL
+        } else { //la ligne n'est pas une station, donc il s'agit d'un consommateur, auquel cas on récupère sa consommation pour l'intégrer à celle de la station
+            if (station == NULL) { // si la première ligne n'est pas une station, crée une station avec capacité inconnue, à 0 par défaut
+                long temp[8] = {chaine[1], chaine[2], chaine[3], chaine[4], chaine[5], 0, 0};
+                station = creer_station(temp);
+            }
+            station->conso += chaine[7];//integration de la consommation du consommateur à celle de sa station
+        }
+    }
+    // Traitement générique du fichier. Le commentary est le même puisque le code est dédoublé pour éviter une vérification que la station existe à chaque itération
+    while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3],
+                  &chaine[4],
+                  &chaine[5], &chaine[6], &chaine[7]) != EOF) {
         if (get_type_station(chaine) != DEFAUT) {
             station = creer_station(chaine);
             avl = insertionAVL(avl, station, hauteur);
-        }
-        else {
-            if (station == NULL) {
-                long temp[8] = {chaine[1], chaine[2], chaine[3], chaine[4], chaine[5],0, 0}; //si la première ligne n'est pas une station, crée une station avec capacité inconnue
-                station = creer_station(temp);
-            }
+        } else {
             station->conso += chaine[7];
         }
     }
-    return avl;
+    return avl; // on retourne l'avl
 }
 
-int main(){
-    pAVL avl = NULL;
-    int hauteur = 0;
-    FILE *fichier = NULL;
+int main() {
+    pAVL avl = NULL; // initialisation de l'avl
+    int hauteur = 0; //hauteur par défaut est de 0
+    FILE *fichier = NULL; //préparation du pointeur vers le fichier input
 
-    fichier = fopen("tmp/input.dat", "r");
+    // TODO: quand les fichiers seront réassemblés selon la consigne, éditer le chemin vers input
+    fichier = fopen("tmp/input.dat", "r"); //ouverture d'input en mode lecture
 
-    if (fichier != NULL) {
-        avl = traitement_input(fichier, avl, &hauteur);
-        fclose(fichier);
+    if (fichier != NULL) { //si le fopen a réussi
+        avl = traitement_input(fichier, avl, &hauteur); //on va traiter le fichier et construire l'avl
+        fclose(fichier); //puis on ferme le fichier
     } else {
         // On affiche un message d'erreur si on veut
         printf("Impossible d'ouvrir le fichier input.dat");
         exit(1);
     }
     afficherAVL(avl, hauteur);
-    free_avl(avl);
+
+    //code de nina
+
+    liberation_avl(avl); //libération de l'avl
     return 0;
 }
