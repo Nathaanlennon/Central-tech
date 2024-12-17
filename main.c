@@ -70,7 +70,7 @@ pStation creer_station(long chaine[8]) {
     station->capacité = chaine[6];
     return station;
 }
-//TODO: faire la fonction qui traite le fichier (ou mettre dans main si impossible d'en faire une fonction)
+
 
 pAVL creerAVL(pStation e) {
     // Alloue de la mémoire pour un nouveau nœud
@@ -196,33 +196,43 @@ void afficherAVL(pAVL nd, int niveau) {
     afficherAVL(nd->fg, niveau + 1);
 }
 
-int main() {
+pAVL traitement_input(FILE* fichier, pAVL avl, int* hauteur) {
+    if (fichier == NULL) {
+        return NULL;
+    }
+    if (avl !=NULL) {
+        // TODO:fonction qui libère l'avl entièrement
+    }
+    long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    pStation station = NULL;
+
+    // TODO: modifier la boucle et la vérification pour éviter de faire e if tation == null à  chaque coup
+    while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
+           &chaine[5], &chaine[6], &chaine[7]) != EOF) {
+        if (get_type_station(chaine) != DEFAUT) {
+            station = creer_station(chaine);
+            avl = insertionAVL(avl, station, hauteur);
+        }
+        else {
+            if (station == NULL) {
+                long temp[8] = {chaine[1], chaine[2], chaine[3], chaine[4], chaine[5],0, 0}; //si la première ligne n'est pas une station, crée une station avec capacité inconnue
+                station = creer_station(temp);
+            }
+            station->conso += chaine[7];
+        }
+    }
+    return avl;
+}
+
+int main(){
     pAVL avl = NULL;
     int hauteur = 0;
-    int balance = 0;
-
-
-
-    afficherAVL(avl, 0);
-    printf("Hello World\n");
     FILE *fichier = NULL;
 
     fichier = fopen("tmp/input.dat", "r");
 
     if (fichier != NULL) {
-        long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        pStation station = NULL;
-        while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4],
-               &chaine[5], &chaine[6], &chaine[7]) != EOF) {
-            if (get_type_station(chaine) != DEFAUT) {
-                station = creer_station(chaine);
-                avl = insertionAVL(avl, station, &hauteur);
-            }
-            else {
-                station->conso += chaine[7];
-            }
-        }
-
+        avl = traitement_input(fichier, avl, &hauteur);
         fclose(fichier);
     } else {
         // On affiche un message d'erreur si on veut
@@ -230,5 +240,7 @@ int main() {
         exit(1);
     }
     afficherAVL(avl, hauteur);
+
+
     return 0;
 }
