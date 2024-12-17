@@ -196,12 +196,26 @@ void afficherAVL(pAVL nd, int niveau) {
     afficherAVL(nd->fg, niveau + 1);
 }
 
+void free_avl(pAVL avl) {
+    if (avl == NULL) {
+        return;
+    }
+    if (avl->fd != NULL) {
+        free_avl(avl->fd);
+    }
+    if (avl->fg != NULL) {
+        free_avl(avl->fg);
+    }
+    free(avl);
+}
+
 pAVL traitement_input(FILE* fichier, pAVL avl, int* hauteur) {
     if (fichier == NULL) {
         return NULL;
     }
     if (avl !=NULL) {
-        // TODO:fonction qui libère l'avl entièrement
+        free_avl(avl);
+        avl = NULL;
     }
     long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     pStation station = NULL;
@@ -240,7 +254,6 @@ int main(){
         exit(1);
     }
     afficherAVL(avl, hauteur);
-
-
+    free_avl(avl);
     return 0;
 }
