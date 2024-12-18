@@ -1,5 +1,5 @@
 //
-// Created by natha on 04/12/2024.
+// Created by nathan on 04/12/2024.
 //
 
 #include <stdio.h>
@@ -196,30 +196,28 @@ void afficherAVL(pAVL nd, int niveau) {
     afficherAVL(nd->fg, niveau + 1);
 }
 
-void affiche_csv(pAVL a){
-
-    FILE *fichier= NULL;
-
-    if(a->station->type == HVA){
-        fichier = fopen("hva_comp.csv", "w");
-        if(fichier == NULL){
-                exit(1);
+void AVL_to_output(pAVL a) {
+    FILE* fichier = NULL;
+    fichier = fopen("tmp/output.csv", "w");
+    if (fichier != NULL) {
+        if( a != NULL) {
+            fprintf("%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
         }
-        fprintf(fichier, "Station HV-A:Capacité:Comsommation(entreprise)\n");
+        if (a->fg != NULL) {
+            parcoursPrefixe(a->fg);
+        }
+        if (a->fd != NULL) {
+            parcoursPrefixe(a->fd);
+        }
     }
-    if (a->station->type == HVB) {
-        fichier = fopen("hvb_comp.csv", "w");
-        if(fichier == NULL){
-            exit(1);
-        }fprintf(fichier, "Station HV-B:Capacité:Comsommation(entreprise)\n");
-    }
-    if (a->station->type == LV) {
-        fichier = fopen("lv_comp.csv", "w");
-        if(fichier == NULL){
-            exit(1);
-        }fprintf(fichier, "Station LV:Capacité:Comsommation(entreprise)\n");
+    else {
+        exit(1);
     }
 }
+
+
+
+
 
 int main() {
     pAVL avl = NULL;
@@ -256,6 +254,5 @@ int main() {
     }
     afficherAVL(avl, hauteur);
 
-    affiche_csv(avl);
     return 0;
 }
