@@ -28,6 +28,21 @@ h () {
     "
        
 }
+
+#supprime les anciens résultats s'ils existent
+if [ -e hva_comp.csv ];then
+    echo "123"
+    rm hva_comp.csv
+elif [ -e hvb_comp.csv ];then
+    rm hvb_comp.csv
+elif [ -e lv_all.csv ];then
+    rm lv_all.csv
+elif [ -e lv_indiv.csv ];then
+    rm lv_indiv.csv
+elif [ -e lv_comp.csv ];then
+    rm lv_comp.csv
+fi
+
 #vérifie si la fonction d'aide est appelée
 for arg in "$@"; do
     if [ "$arg" = "-h" ]; then
@@ -68,31 +83,36 @@ fi
 #initialisation de la variable
 typestation=0
 
-#accorde la variable avec la colonne du type de station appelé et crée le fichier nécessaire si l'utilisateur a utilise "hva" ou "hvb" en type de station
+#accorde la variable avec la colonne du type de station appelé et crée le fichier nécessaire si l'utilisateur a utilise "hva", "hvb" ou "all" en type de station
 if [ $2 == "hvb" ]; then
 	typestation=2;
-    touch hvb_comp.cvs
+    touch hvb_comp.csv
+    echo "Station HV-B:Capacité:Consommation (entreprises)" > hvb_comp.csv
 elif [ $2 == "hva" ]; then
 	typestation=3;
     touch hva_comp.csv
+    echo "Station HV-A:Capacité:Consommation (entreprises)" > hva_comp.csv
 elif [ $2 == "lv" ]; then
 	typestation=4;
+    if [ $3 == "comp" ]; then        
+        touch lv_comp.csv
+        echo "Station LV:Capacité:Consommation (entreprises)" > lv_comp.csv
+    elif [ $3 == "indiv" ]; then
+        touch lv_indiv.csv
+        echo "Station LV:Capacité:Consommation (particuliers)" > lv_indiv.csv
+    elif [ $3 == "all" ]; then
+        touch lv_all.csv
+        echo "Station LV:Capacité:Consommation (tous)" > lv_all.csv
+    fi
 fi
 
-#accorde la variable typeconso avec la colonne du type de consomatteur appelé ( met à 0 pour all car on en aura besoin pour une vérification) et crée le fichier nécessaire si l'utilisateur a choisis "lv" en type de station
+#accorde la variable typeconso avec la colonne du type de consomatteur appelé ( met à 0 pour all car on en aura besoin pour une vérification) 
 if [ $3 == "all" ]; then
 	typeconso=0;
-    touch lv_all.cvs
 elif [ $3 == "comp" ]; then
-    if [ "$typestation"=="4" ];then
-        touch lv_comp.cvs
-    fi
 	typeconso=5;
 elif [ $3 == "indiv" ]; then
 	typeconso=6;
-    if [ "$typestation"=="4" ];then
-        touch lv_indiv.cvs
-    fi
 fi 
 
 #vérifie si un identifiant de centrale est appelé
@@ -150,10 +170,6 @@ else
     echo "Création du dossier graph..."
     mkdir graph
 fi
-
-
-
-
 
 echo "Filtrage des données en cours..."
 Avant=$SECONDS
