@@ -15,10 +15,10 @@
 enum type_station { DEFAUT, HVB, HVA, LV }; //defaut équivaut à nul, vide, etc
 
 typedef struct Station {
-    unsigned int id;
+    unsigned long id;
     unsigned int type; // voir enum type_station
     long capacité;
-    long conso;
+    unsigned long conso;
 } Station, *pStation;
 
 
@@ -30,7 +30,7 @@ typedef struct AVL {
 } AVL, *pAVL;
 
 //Permet d'obtenir le type de la station que l'on crée et le retourne sous la forme d'un int, voir enum type_station
-int get_type_station(long chaine[8]) {
+unsigned int get_type_station(long chaine[8]) {
     if (chaine[4] != 0 || chaine[5] != 0) {
         //vérifie qu'il s'agit d'une station, retourne le type defaut donc erreur. Il s'agit donc probablement d'un consommateur
         return DEFAUT;
@@ -50,7 +50,7 @@ int get_type_station(long chaine[8]) {
 pStation creer_station(long chaine[8]) {
     pStation station = NULL;
     station = malloc(sizeof(Station)); //allocation mémoire en fonction de la taille de la structure
-    int type = get_type_station(chaine);
+    unsigned int type = get_type_station(chaine);
     switch (type) {
         case LV:
             station->id = chaine[3]; //récupère l'id dans la colone associée au type (pareil pour chaque cas du switch)
@@ -92,29 +92,29 @@ pAVL creerAVL(pStation station) {
     return new;
 }
 
-pAVL rotationGauche(pAVL a) {
-    pAVL pivot = a->fd; // Le fils droit devient le pivot
-    int eq_a = a->eq, eq_p = pivot->eq;
+pAVL rotationGauche(pAVL avl) {
+    pAVL pivot = avl->fd; // Le fils droit devient le pivot
+    int eq_avl = avl->eq, eq_p = pivot->eq;
 
-    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de 'a'
-    pivot->fg = a; // 'a' devient le fils gauche du pivot
+    avl->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de 'a'
+    pivot->fg = avl; // 'a' devient le fils gauche du pivot
 
     // Mise à jour des facteurs d'équilibre
-    a->eq = eq_a - MAX(eq_p, 0) - 1;
-    pivot->eq = MIN(MIN(eq_a - 2, eq_a + eq_p - 2), eq_p - 1);
+    avl->eq = eq_avl - MAX(eq_p, 0) - 1;
+    pivot->eq = MIN(MIN(eq_avl - 2, eq_avl + eq_p - 2), eq_p - 1);
 
     return pivot; // Le pivot devient la nouvelle racine
 }
 
-pAVL rotationDroite(pAVL a) {
-    pAVL pivot = a->fg; // Le fils gauche devient le pivot
-    int eq_a = a->eq, eq_p = pivot->eq;
+pAVL rotationDroite(pAVL avl) {
+    pAVL pivot = avl->fg; // Le fils gauche devient le pivot
+    int eq_a = avl->eq, eq_p = pivot->eq;
 
-    a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de 'a'
-    pivot->fd = a; // 'a' devient le fils droit du pivot
+    avl->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de 'a'
+    pivot->fd = avl; // 'a' devient le fils droit du pivot
 
     // Mise à jour des facteurs d'équilibre
-    a->eq = eq_a - MIN(eq_p, 0) + 1;
+    avl->eq = eq_a - MIN(eq_p, 0) + 1;
     pivot->eq = MAX(MAX(eq_a + 2, eq_a + eq_p + 2), eq_p + 1);
 
     return pivot; // Le pivot devient la nouvelle racine
@@ -194,7 +194,7 @@ void afficherAVL(pAVL nd, int niveau) {
     for (int i = 0; i < niveau; i++) {
         printf("     "); // Ajoute des espaces pour indenter
     }
-    printf("%d "
+    printf("%lu "
            "\x1B[0;34m"
            "%d\n"
            "\x1B[0m",
@@ -230,7 +230,7 @@ pAVL traitement_input(FILE *fichier, pAVL avl, int *hauteur) {
         avl = NULL; //on le remet à null
         *hauteur = 0; // et on remet la hauteur à 0
     }
-    long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0}; //initialisation de la chaine de caractère qui prend la ligne actuelle
+    unsigned long chaine[8] = {0, 0, 0, 0, 0, 0, 0, 0}; //initialisation de la chaine de caractère qui prend la ligne actuelle
     pStation station = NULL; //préparation de la station que l'on va créer
 
     //la première iteration de la boucle est en dehors das le cas où la premièr ligne n'est pas une station, auquel cas on suppose sa station et sa capacité est mise à 0 par défaut
@@ -241,21 +241,34 @@ pAVL traitement_input(FILE *fichier, pAVL avl, int *hauteur) {
             avl = insertionAVL(avl, station, hauteur); //et on intègre la station dans l'AVL
         } else { //la ligne n'est pas une station, donc il s'agit d'un consommateur, auquel cas on récupère sa consommation pour l'intégrer à celle de la station
             if (station == NULL) { // si la première ligne n'est pas une station, crée une station avec capacité inconnue, à 0 par défaut
-                long temp[8] = {chaine[1], chaine[2], chaine[3], chaine[4], chaine[5], 0, 0};
+                unsigned long temp[8] = {chaine[0], chaine[1], chaine[2], chaine[3], 0, 0, 0, 0};
                 station = creer_station(temp);
+                avl = insertionAVL(avl, station, hauteur);
             }
-            station->conso += chaine[7];//integration de la consommation du consommateur à celle de sa station
+            if (chaine[station->type] == station->id) {
+                station->conso += chaine[7];//integration de la consommation du consommateur à celle de sa station
+            }
+            else {
+                // TODO: faire la partie où le consommateur n'est pas lié à la station + tout rajouter dans la boucle while
+                // potentiellement le stocker quelque part et ensuite reparcourir l'avl pour trouver sa station, le supprimer sinon
+            }
         }
     }
     // Traitement générique du fichier. Le commentary est le même puisque le code est dédoublé pour éviter une vérification que la station existe à chaque itération
     while (fscanf(fichier, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3],
                   &chaine[4],
                   &chaine[5], &chaine[6], &chaine[7]) != EOF) {
-        if (get_type_station(chaine) != DEFAUT) {
+        if (get_type_station(chaine) == station->type) { //ici, on vérifie que le type de station est identique au type de la station précédante pour avoir un avl cohérant
             station = creer_station(chaine);
             avl = insertionAVL(avl, station, hauteur);
         } else {
-            station->conso += chaine[7];
+            if (chaine[station->type] == station->id) {
+                station->conso += chaine[7];//integration de la consommation du consommateur à celle de sa station
+            }
+            else {
+                // TODO: faire la partie où le consommateur n'est pas lié à la station + tout rajouter dans la boucle while
+                // potentiellement le stocker quelque part et ensuite reparcourir l'avl pour trouver sa station, le supprimer sinon
+            }
         }
     }
     return avl; // on retourne l'avl
