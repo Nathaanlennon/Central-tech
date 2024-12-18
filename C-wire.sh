@@ -55,6 +55,12 @@ if [ -e lv_all.csv ];then
     ancienTest=$fichier$current_date.csv
     mv lv_all.csv tests/$ancienTest
 fi
+if [ -e lv_all_minmax.csv ];then
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=lv_all_minmax
+    ancienTest=$fichier$current_date.csv
+    mv lv_all_minmax.csv tests/$ancienTest
+fi
 if [ -e lv_indiv.csv ];then
     current_date=$(date +"%Y%m%d%H%M%S")
     fichier=lv_indiv
@@ -268,6 +274,8 @@ fi
 echo "Exécution du programme..."
 make run
 
+cp output.csv tmp/output.csv
+
 if [ -e hva_comp.csv ];then
     touch tmp/tri.csv
     sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
@@ -282,6 +290,9 @@ if [ -e lv_all.csv ];then
     touch tmp/tri.csv
     sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
     awk '{print $0}' tmp/tri.csv  >> lv_all.csv
+    touch lv_all_minmax.csv
+    head lv_all.csv > lv_all_minmax.csv
+    tail lv_all.csv >> lv_all_minmax.csv
 fi
 if [ -e lv_indiv.csv ];then
     touch tmp/tri.csv
