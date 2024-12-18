@@ -29,18 +29,43 @@ h () {
        
 }
 
-#supprime les anciens résultats s'ils existent
+if [ -d tests ]; then
+    echo "Le dossier tests existe"
+else
+    echo "Création du dossier tests..."
+    mkdir tests
+fi
+
+#deplace les anciens résultats s'ils existent
 if [ -e hva_comp.csv ];then
-    echo "123"
-    rm hva_comp.csv
-elif [ -e hvb_comp.csv ];then
-    rm hvb_comp.csv
-elif [ -e lv_all.csv ];then
-    rm lv_all.csv
-elif [ -e lv_indiv.csv ];then
-    rm lv_indiv.csv
-elif [ -e lv_comp.csv ];then
-    rm lv_comp.csv
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=hva_comp
+    ancienTest=$fichier$current_date.csv
+    mv hva_comp.csv tests/$ancienTest
+fi
+if [ -e hvb_comp.csv ];then
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=hvb_comp
+    ancienTest=$fichier$current_date.csv
+    mv hvb_comp.csv tests/$ancienTest
+fi
+if [ -e lv_all.csv ];then
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=lv_all
+    ancienTest=$fichier$current_date.csv
+    mv lv_all.csv tests/$ancienTest
+fi
+if [ -e lv_indiv.csv ];then
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=lv_indiv
+    ancienTest=$fichier$current_date.csv
+    mv lv_indiv.csv tests/$ancienTest
+fi
+if [ -e lv_comp.csv ];then
+    current_date=$(date +"%Y%m%d%H%M%S")
+    fichier=lv_comp
+    ancienTest=$fichier$current_date.csv
+    mv lv_comp.csv tests/$ancienTest
 fi
 
 #vérifie si la fonction d'aide est appelée
@@ -242,3 +267,29 @@ fi
 
 echo "Exécution du programme..."
 make run
+
+if [ -e hva_comp.csv ];then
+    touch tmp/tri.csv
+    sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
+    awk '{print $0}' tmp/tri.csv  >> hva_comp.csv
+fi
+if [ -e hvb_comp.csv ];then
+    touch tmp/tri.csv
+    sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
+    awk '{print $0}' tmp/tri.csv  >> hvb_comp.csv
+fi
+if [ -e lv_all.csv ];then
+    touch tmp/tri.csv
+    sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
+    awk '{print $0}' tmp/tri.csv  >> lv_all.csv
+fi
+if [ -e lv_indiv.csv ];then
+    touch tmp/tri.csv
+    sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
+    awk '{print $0}' tmp/tri.csv  >> lv_indiv.csv
+fi
+if [ -e lv_comp.csv ];then
+    touch tmp/tri.csv
+    sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
+    awk '{print $0}' tmp/tri.csv  >> lv_comp.csv
+fi
