@@ -127,7 +127,7 @@ elif [ $2 == "hva" ]; then
     echo "Station HV-A:Capacité:Consommation (entreprises)" > hva_comp.csv
 elif [ $2 == "lv" ]; then
 	typestation=4;
-    if [ $3 == "comp" ]; then
+    if [ $3 == "comp" ]; then        
         touch lv_comp.csv
         echo "Station LV:Capacité:Consommation (entreprises)" > lv_comp.csv
     elif [ $3 == "indiv" ]; then
@@ -139,19 +139,19 @@ elif [ $2 == "lv" ]; then
     fi
 fi
 
-#accorde la variable typeconso avec la colonne du type de consomatteur appelé ( met à 0 pour all car on en aura besoin pour une vérification)
+#accorde la variable typeconso avec la colonne du type de consomatteur appelé ( met à 0 pour all car on en aura besoin pour une vérification) 
 if [ $3 == "all" ]; then
 	typeconso=0;
 elif [ $3 == "comp" ]; then
 	typeconso=5;
 elif [ $3 == "indiv" ]; then
 	typeconso=6;
-fi
+fi 
 
 #vérifie si un identifiant de centrale est appelé
 if [ -z $4 ]; then
     centrale=0;
-else
+else 
     #vérifie que le numéro de centrale est un entier
     if [[ $4 == +([0-9]) ]]; then
         #vérifie que la centrale existe ( c'est à dire est incluse dans l'intervalle de l'identifiant de la 1ere et de la derniere centrale inclus )
@@ -165,7 +165,7 @@ else
             centrale=1;
             echo "$centrale"
         fi
-    else
+    else 
         echo -e "\033[31mLe numéro de centrale doit être un entier\033[0m"
         h
         exit
@@ -209,8 +209,8 @@ Avant=$SECONDS
 
 #supprime la 1ere ligne de texte pour avoir seulement les données dans le fichier
 
-#vérifie si un identifiant de centrale a été entrer
-if [ "$centrale" -eq 0 ]; then
+#vérifie si un identifiant de centrale a été entrer 
+if [ "$centrale" -eq 0 ]; then 
     #filtre les données pour n'avoir que les données nécessaire si l'utilisateur a entrer "lv all"
     if [ "$3" == "all" ]; then
 	    awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp2.dat
@@ -218,7 +218,7 @@ if [ "$centrale" -eq 0 ]; then
     #filtre pour les autres cas
     else
 	    awk -F';' -v col="$typestation" '$col != "-" {print $0}' $1 > tmp/temp.dat
-
+    	
         awk -F';' -v col="$typeconso" -v col2="$typestation" '
     {
         if (col2 != 4) {
@@ -233,16 +233,16 @@ if [ "$centrale" -eq 0 ]; then
     }' tmp/temp.dat > tmp/temp2.dat
     sed -i "1d" tmp/temp2.dat
     fi
-else
+else 
     #filtre selon la centrale
     awk -F';' -v idcentrale="$4" '$1 == idcentrale {print $0}' "$1" > tmp/temp3.dat
         #filtre les données pour n'avoir que les données nécessaire si l'utilisateur a entrer "lv all"
         if [ ""$3 == "all" ]; then
 	        awk -F';' -v col="$typestation" '$col != "-" {print $0}' tmp/temp3.dat > tmp/temp2.dat
-        #filtre pour les autres cas
+        #filtre pour les autres cas 
         else
 	        awk -F';' -v col="$typestation" '$col != "-" {print $0}' tmp/temp3.dat > tmp/temp.dat
-
+    	
             awk -F';' -v col="$typeconso" -v col2="$typestation" '
         {
             if (col2 != 4) {
@@ -263,10 +263,10 @@ Intervalle=$(($SECONDS - $Avant))
 echo "Durée du filtrage : $Intervalle secondes"
 
 #vérifie si l'executable existe
-if ! [ -x Central_tech ]; then
+if ! [ -x Central_tech ]; then 
     echo "L'executable C n'existe pas, compilation en cours..."
     make build
-    #vérifie que la dernière commande ( càd la compilation ) a fonctionné
+    #vérifie que la dernière commande ( càd la compilation ) a fonctionné 
     if [ $? -ne 0 ]; then
         echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
         exit 1
