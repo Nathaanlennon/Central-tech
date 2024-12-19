@@ -1,30 +1,24 @@
 # Central-tech
 
-Make sure to compile everything like this :
+Veillez à tout compiler comme ce qui suit :
 
-For windows : 
+Pour Windows :
 
-Use the makefile with the following commands : `make` to create the executable
-    `.\exec` to run the program
-    `make clean` to delete temporary files
+Utilisez le fichier # makefile avec les commandes suivantes : make pour créer l'exécutable `.\exec` pour lancer le programme make clean pour supprimer les fichiers temporaires.
 
- In the event of an error, you can use the classic compilation command
-    `gcc main.c lib/utils.c lib/map.c lib/tile.c lib/game.c -o my_program`
+En cas d'erreur, vous pouvez utiliser la commande de compilation classique `gcc main.c lib/utils.c lib/map.c lib/tile.c lib/game.c -o mon_programme`
 
-Check file paths if you encounter any error.
+Vérifiez les chemins d'accès aux fichiers si vous rencontrez une erreur.
 
-For linux :
+Pour linux :
 
-Use the makefile with the following commands : `make` to create the executable
-     `./exec` to run the program
-     `make clean` to delete temporary files
+Utilisez le fichier # makefile avec les commandes suivantes : make pour créer l'exécutable `./exec` pour lancer le programme make clean pour supprimer les fichiers temporaires.
 
- In the event of an error, you can use the classic compilation command
-    `gcc -o my_program main.c lib/utils.c lib/map.c lib/tile.c lib/game.c`
+En cas d'erreur, vous pouvez utiliser la commande de compilation classique `gcc -o mon_programme main.c lib/utils.c lib/map.c lib/tile.c lib/game.c`
 
+Il ne nécessite aucune extension particulière si ce n'est un # runner de code C et tous les fichiers contenus dans les dossiers lib, include et main.c.
 
-It doesn't need any special extention except for a C code runner and all the files contained in lib's folder, include's folder and main.c.
+L'objectif du projet C-Wire est de développer un programme permettant d'analyser les données d'un réseau de distribution d'électricité. Le réseau est organisé sous la forme d'un arbre, avec différents niveaux allant des centrales électriques aux consommateurs finaux. Le projet est basé sur deux parties : un script Shell pour filtrer et automatiser les tâches, et un script C pour effectuer efficacement les calculs nécessaires.
 
-The aim of the C-Wire project is to develop a program for analyzing data from an electricity distribution network. The network is organized in the form of a tree, with different levels ranging from power plants to end consumers. The project is based on two parts: a Shell script for filtering and automating tasks, and a C script to perform the necessary calculations efficiently.
+Ce programme est séparé en deux parties : le langage .c et le shell.
 
-This programm is separeted in two part : the `language .c` and the `shell`  
