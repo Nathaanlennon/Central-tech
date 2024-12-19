@@ -224,7 +224,7 @@ void AVL_to_output(pAVL a) {
         if (a->fg != NULL) {
             AVL_to_output(a->fg);
         }
-        fprintf("%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
+        fprintf(fichier, "%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
         if (a->fd != NULL) {
             AVL_to_output(a->fd);
         }
