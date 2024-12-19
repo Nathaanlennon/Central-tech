@@ -25,8 +25,8 @@ Langage C :
 
 Pour le c il n' y qu'un seul fichier  `main.c` : 
 Qui utilise tout d'abord les bibliothèques standarts du C :
-<stdio.h> : Fournit des fonctions pour gérer les entrées/sorties. 
-<stdlib.h> : Contient des fonctions afin de gérer la mémoire, mais aussi générer des nombres aléatoires, ou encore convertir des chaînes en nombres, et bien plus.
-<time.h> :  Utilisée pour mesurer la durée ou afficher des horodatages.
-<unistd.h> : Fournit des fonctions pour travailler directement avec le système d'exploitation.
-<ctype.h> : Utilisée pour manipuler ou vérifier les propriétés des caractères par exemple, vérifier si un caractère est une lettre ou un chiffre.
+`<stdio.h> ` : Fournit des fonctions pour gérer les entrées/sorties. 
+`<stdlib.h>` : Contient des fonctions afin de gérer la mémoire, mais aussi générer des nombres aléatoires, ou encore convertir des chaînes en nombres, et bien plus.
+`<time.h>` :  Utilisée pour mesurer la durée ou afficher des horodatages.
+`<unistd.h>` : Fournit des fonctions pour travailler directement avec le système d'exploitation.
+`<ctype.h>` : Utilisée pour manipuler ou vérifier les propriétés des caractères par exemple, vérifier si un caractère est une lettre ou un chiffre.
