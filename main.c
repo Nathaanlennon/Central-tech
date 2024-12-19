@@ -299,7 +299,6 @@ int main() {
         printf("Impossible d'ouvrir le fichier input.dat");
         exit(1);
     }
-    afficherAVL(avl, hauteur);
 
 
     FILE * output = NULL;
