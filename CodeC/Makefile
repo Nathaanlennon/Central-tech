@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g
 
 # Liste des fichiers source
-SOURCES = main.c
+SOURCES = main.c gestion_avl.c gestion_station.c traitement.c
 
 # Liste des fichiers objets correspondant aux fichiers source
 OBJECTS = $(SOURCES:.c=.o)
@@ -33,3 +33,6 @@ clean:
 .PHONY: build
 build: $(TARGET)
 
+.PHONY: run
+run: $(TARGET)
+	./Central_tech
