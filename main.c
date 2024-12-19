@@ -1,7 +1,3 @@
-//
-// Created by natha on 04/12/2024.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,7 +13,7 @@ enum type_station { DEFAUT, HVB, HVA, LV }; //defaut équivaut à nul, vide, etc
 typedef struct Station {
     unsigned long id;
     unsigned int type; // voir enum type_station
-    long capacité;
+    unsigned long capacité;
     unsigned long conso;
 } Station, *pStation;
 
@@ -218,6 +214,26 @@ void liberation_avl(pAVL avl) {
     free(avl); //on libère le noeud actuel
 }
 
+void AVL_to_output(pAVL a) {
+    if (a==NULL) {
+        return;
+    }
+    FILE* fichier = NULL;
+    fichier = fopen("tmp/output.csv", "w");
+    if (fichier != NULL) {
+        if (a->fg != NULL) {
+            AVL_to_output(a->fg);
+        }
+        fprintf("%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
+        if (a->fd != NULL) {
+            AVL_to_output(a->fd);
+        }
+    }
+    else {
+        exit(1);
+    }
+}
+
 // TODO: vérifier que les consommateurs sont bien reliés à la station
 // Traite le fichier mis en argument pour le convertir en AVL. L'avl mit en argument doit être nul et la hauteur doit valoir 0, sinon les deux seront réinitialisés
 pAVL traitement_input(FILE *fichier, pAVL avl, int *hauteur) {
@@ -292,7 +308,7 @@ int main() {
     }
     afficherAVL(avl, hauteur);
 
-    //code de nina
+    AVL_to_output(avl);
 
     liberation_avl(avl); //libération de l'avl
     return 0;
