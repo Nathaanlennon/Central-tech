@@ -24,7 +24,9 @@ Le projet est divisé en deux parties : un script Shell pour filtrer et automati
 Langage C : 
 
 Pour le c il n' y qu'un seul fichier  `main.c` : 
+
 Qui utilise tout d'abord les bibliothèques standarts du C :
+
 `<stdio.h> ` : Fournit des fonctions pour gérer les entrées/sorties.
 
 `<stdlib.h>` : Contient des fonctions afin de gérer la mémoire, mais aussi générer des nombres aléatoires, ou encore convertir des chaînes en nombres, et bien plus.
