@@ -64,9 +64,10 @@ for arg in "$@"; do
         break
     fi
 done
-#vérifie que le chemin est donnée
+
+#vérifie que le fichier est donnée
 if [ ! -f $1 ]; then
-    echo -e "\033[31m Erreur : le chemin n'est pas donné \033[0m"
+    echo -e "\033[31m Erreur : le fichier n'est pas donné \033[0m"
     echo "durée du traitement : 0.0 seconde"
     h
     exit 2
@@ -93,22 +94,6 @@ if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     exit 5
 fi
 
-#vérifie si le dossier input existe, le créé sinon
-if [ -d input ]; then
-    echo "Le dossier input existe"
-    #vérifie si le dossier est vide ou pas
-    if [ "$(ls -A input)" ]; then
-        echo "rénitialisation du dossier..."
-        rm -r input/*
-    else
-        echo "le dossier est déjà vide"
-    fi
-else
-    echo "Création du dossier input..."
-    mkdir input
-fi
-
-cp $1 > input/$1
 
 #vérifie si le dossier tmp existe, le créé sinon
 if [ -d tmp ]; then
