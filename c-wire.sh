@@ -22,11 +22,11 @@ h () {
                 - hva all
                 - hva indiv
     4 : Identifiant de centrale ( Optionnel ) :
-                -> Filtre les résultats pour une centrale spécifique
-
+                -> Filtre les résultats pour une centrale spécifique 
+    
     \033[32mExemple : bash C-wire.sh c-wire_v00.dat hvb comp 1\033[0m
     "
-
+       
 }
 
 #verifie si le dossier test existe, le crée sinon
@@ -68,7 +68,7 @@ done
 if [ ! -f $1 ]; then
     echo -e "\033[31m Erreur : le chemin n'est pas donné \033[0m"
     echo "durée du traitement : 0.0 seconde"
-    h
+    h 
     exit
 fi
 #vérifie que le type de station est valide
@@ -227,7 +227,7 @@ if [ "$centrale" -eq 0 ]; then
     #récupere les stations de base avec leur capacite
     {
         if (col2 != 4) {
-            if ($col != "-" || $(col2 + 1) == "-") {
+            if ($col != "-" || $(col2 + 1) == "-") { 
                 print $0
             }
         } else {
@@ -300,7 +300,7 @@ Intervalle2=$(($SECONDS - $Avant2))
 echo "Durée de l'executable : $Intervalle2 secondes"
 
 #reviens dans le repertoire initial
-cd ..
+cd .. 
 
 #Trie le output selon la consommation et crée le fichier final
 if [ -e hva_comp$nomCentrale.csv ];then
