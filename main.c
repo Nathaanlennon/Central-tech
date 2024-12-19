@@ -204,10 +204,10 @@ void AVL_to_output(pAVL a) {
             fprintf("%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
         }
         if (a->fg != NULL) {
-            parcoursPrefixe(a->fg);
+            AVL_to_output(a->fg);
         }
         if (a->fd != NULL) {
-            parcoursPrefixe(a->fd);
+            AVL_to_output(a->fd);
         }
     }
     else {
@@ -253,6 +253,6 @@ int main() {
         exit(1);
     }
     afficherAVL(avl, hauteur);
-
+    AVL_to_output(avl);
     return 0;
 }
