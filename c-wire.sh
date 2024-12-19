@@ -22,11 +22,11 @@ h () {
                 - hva all
                 - hva indiv
     4 : Identifiant de centrale ( Optionnel ) :
-                -> Filtre les résultats pour une centrale spécifique 
-    
+                -> Filtre les résultats pour une centrale spécifique
+
     \033[32mExemple : bash C-wire.sh c-wire_v00.dat hvb comp 1\033[0m
     "
-       
+
 }
 
 #verifie si le dossier test existe, le crée sinon
@@ -60,7 +60,7 @@ fi
 for arg in "$@"; do
     if [ "$arg" = "-h" ]; then
         h
-        exit
+        exit 1
         break
     fi
 done
@@ -68,30 +68,47 @@ done
 if [ ! -f $1 ]; then
     echo -e "\033[31m Erreur : le chemin n'est pas donné \033[0m"
     echo "durée du traitement : 0.0 seconde"
-    h 
-    exit
+    h
+    exit 2
 fi
 #vérifie que le type de station est valide
 if [[ $2 != "hvb" && $2 != "hva" && $2 != "lv" ]]; then
     echo -e "\033[31mErreur : Type de station invalide\033[0m"
     echo "durée du traitement : 0.0 seconde"
     h
-    exit 1
+    exit 3
 fi
 #vérifie que le type de consommateur est valide
 if [[ $3 != "comp" && $3 != "indiv" && $3 != "all" ]]; then
     echo -e "\033[31mErreur : Type de consommateurs invalide\033[0m"
     echo "durée du traitement : 0.0 seconde"
     h
-    exit 1
+    exit 4
 fi
 #vérifie que l'option choisie est possible
 if [[ ( $2 == "hva" || $2 == "hvb" )&& ( $3 == "indiv" || $3 == "all" ) ]]; then
     echo -e "\033[31mErreur : Option choisie impossible\033[0m"
     echo "durée du traitement : 0.0 seconde"
     h
-    exit
+    exit 5
 fi
+
+#vérifie si le dossier input existe, le créé sinon
+if [ -d input ]; then
+    echo "Le dossier input existe"
+    #vérifie si le dossier est vide ou pas
+    if [ "$(ls -A input)" ]; then
+        echo "rénitialisation du dossier..."
+        rm -r input/*
+    else
+        echo "le dossier est déjà vide"
+    fi
+else
+    echo "Création du dossier input..."
+    mkdir input
+fi
+
+cp $1 > input/$1
 
 #vérifie si le dossier tmp existe, le créé sinon
 if [ -d tmp ]; then
@@ -152,7 +169,7 @@ else
             echo -e "\033[31mCentrale non existante\033[0m"
             echo "durée du traitement : 0.0 seconde"
             h
-            exit
+            exit 6
         else
             centrale=1;
             nomCentrale="_$4"
@@ -161,7 +178,7 @@ else
         echo -e "\033[31mLe numéro de centrale doit être un entier\033[0m"
         echo "durée du traitement : 0.0 seconde"
         h
-        exit
+        exit 7
     fi
 fi
 
@@ -195,6 +212,9 @@ elif [ $2 == "lv" ]; then
     elif [ $3 == "all" ]; then
         touch lv_all$nomCentrale.csv
         echo "Station LV:Capacité:Consommation (tous)" > lv_all$nomCentrale.csv
+        touch lv_all_minmax$nomCentrale.csv
+        echo "Min and Max 'capacity-load' extreme nodes" > lv_all_minmax$nomCentrale.csv
+        echo "Station LV:Capacité:Consommation (tous)" > lv_all_minmax$nomCentrale.csv
         touch tmp/stockNom
         echo "lv_all$nomCentrale.csv" > tmp/stockNom
         touch tmp/stockNom2
@@ -227,7 +247,7 @@ if [ "$centrale" -eq 0 ]; then
     #récupere les stations de base avec leur capacite
     {
         if (col2 != 4) {
-            if ($col != "-" || $(col2 + 1) == "-") { 
+            if ($col != "-" || $(col2 + 1) == "-") {
                 print $0
             }
         } else {
@@ -270,37 +290,41 @@ tr '-' '0' < tmp/temp2.dat > tmp/input.dat
 Intervalle=$(($SECONDS - $Avant))
 echo "durée du filtrage : $Intervalle"
 
+#verifie si le repertoire CodeC existe
+if [ -d CodeC ]; then
+    echo "CodeC existe"
+else
+    echo -e "\033[31mErreur : Répertoire CodeC non trouvé\033[0m"
+    echo "Durée du script : 0 secondes"
+    exit 8
+fi
+
+
 #vérifie si l'executable existe
+cd CodeC
 if ! [ -x Central_tech ]; then
     echo "L'executable C n'existe pas, compilation en cours..."
-    CodeC/make build
+    make build
     #vérifie que la dernière commande ( càd la compilation ) a fonctionné
     if [ $? -ne 0 ]; then
         echo -e "\033[31mErreur : Échec de la compilation de l'executable\033[0m"
-        exit 1
+        echo "Durée du script : 0 secondes"
+        exit 9
     else
         echo "Compilation réussie."
     fi
 fi
 
 Avant2=$SECONDS
-
-#verifie si le repertoire CodeC existe, si oui, se depplace dedans et lance le programme C sinon erreur
 echo "Exécution du programme..."
-if [ -d CodeC ]; then
-    cd CodeC
-    make run
-else
-    echo -e "\033[31mErreur : Répertoire CodeC non trouvé\033[0m"
-    echo "Durée du script : 0 secondes"
-    exit
-fi
+make run
+cd ..
 
 Intervalle2=$(($SECONDS - $Avant2))
 echo "Durée de l'executable : $Intervalle2 secondes"
 
 #reviens dans le repertoire initial
-cd .. 
+cd .
 
 #Trie le output selon la consommation et crée le fichier final
 if [ -e hva_comp$nomCentrale.csv ];then
@@ -317,9 +341,11 @@ if [ -e lv_all$nomCentrale.csv ];then
     touch tmp/tri.csv
     sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
     awk '{print $0}' tmp/tri.csv  >> lv_all$nomCentrale.csv
-    touch lv_all_minmax$nomCentrale.csv
-    head lv_all$nomCentrale.csv > lv_all_minmax$nomCentrale.csv
-    tail lv_all$nomCentrale.csv >> lv_all_minmax$nomCentrale.csv
+    touch tmp/lv_all_mm$nomCentrale.csv
+    head lv_all$nomCentrale.csv > tmp/lv_all_mm$nomCentrale.csv
+    tail lv_all$nomCentrale.csv >> tmp/lv_all_mm$nomCentrale.csv
+    sed -i "1d" tmp/lv_all_mm$nomCentrale.csv
+    awk -F':' '{if ($2 != 0) print $0 ":" $2-$3}' tmp/lv_all_mm$nomCentrale.csv | sort -t ':' -k4 -n | cut -d':' -f1-3 >> lv_all_minmax$nomCentrale.csv
 fi
 if [ -e lv_indiv$nomCentrale.csv ];then
     touch tmp/tri.csv
