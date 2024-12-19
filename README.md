@@ -18,7 +18,9 @@ En cas d'erreur, vous pouvez utiliser la commande de compilation classique `gcc 
 
 Il ne nécessite aucune extension particulière si ce n'est un # runner de code C et tous les fichiers contenus dans les dossiers lib, include et main.c.
 
-L'objectif du projet C-Wire est de développer un programme permettant d'analyser les données d'un réseau de distribution d'électricité. Le réseau est organisé sous la forme d'un arbre, avec différents niveaux allant des centrales électriques aux consommateurs finaux. Le projet est basé sur deux parties : un script Shell pour filtrer et automatiser les tâches, et un script C pour effectuer efficacement les calculs nécessaires.
+L'objectif principal du projet C-Wire est de développer un programme qui permet d'analyser les données d'un réseau de distribution d'électricité. Le réseau est organisé sous la forme d'un arbre plus exactement un AVL (arbre de recherche automatiquement équilibré), avec différents niveaux allant des centrales électriques (en raçines) aux consommateurs finaux (les fils).
+Le projet est divisé en deux parties : un script Shell pour filtrer et automatiser les tâches, ainsi qu'un script C pour effectuer les calculs nécessaires.
 
-Ce programme est séparé en deux parties : le langage .c et le shell.
+<h1 style="text-decoration: underline;">Langage C : </h1>
+
 
