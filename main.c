@@ -26,7 +26,7 @@ typedef struct AVL {
 } AVL, *pAVL;
 
 //Permet d'obtenir le type de la station que l'on crée et le retourne sous la forme d'un int, voir enum type_station
-unsigned int get_type_station(long chaine[8]) {
+unsigned int get_type_station(unsigned long chaine[8]) {
     if (chaine[4] != 0 || chaine[5] != 0) {
         //vérifie qu'il s'agit d'une station, retourne le type defaut donc erreur. Il s'agit donc probablement d'un consommateur
         return DEFAUT;
@@ -43,7 +43,7 @@ unsigned int get_type_station(long chaine[8]) {
 }
 
 // crée une station en fonction de la chaine associée, renvoie NULL si valeurs incorrectes. Ne s'occupe pas de la consommation
-pStation creer_station(long chaine[8]) {
+pStation creer_station(unsigned long chaine[8]) {
     pStation station = NULL;
     station = malloc(sizeof(Station)); //allocation mémoire en fonction de la taille de la structure
     unsigned int type = get_type_station(chaine);
@@ -214,23 +214,16 @@ void liberation_avl(pAVL avl) {
     free(avl); //on libère le noeud actuel
 }
 
-void AVL_to_output(pAVL a) {
-    if (a==NULL) {
+void AVL_to_output(pAVL a, FILE* fichier) {
+    if (a==NULL || fichier == NULL) {
         return;
     }
-    FILE* fichier = NULL;
-    fichier = fopen("tmp/output.csv", "w");
-    if (fichier != NULL) {
-        if (a->fg != NULL) {
-            AVL_to_output(a->fg);
-        }
-        fprintf(fichier, "%lu:%lu:%lu", a->station->id, a->station->conso, a->station->capacité);
-        if (a->fd != NULL) {
-            AVL_to_output(a->fd);
-        }
+    if (a->fg != NULL) {
+        AVL_to_output(a->fg, fichier);
     }
-    else {
-        exit(1);
+    fprintf(fichier, "%lu:%lu:%lu\n", a->station->id, a->station->capacité, a->station->conso);
+    if (a->fd != NULL) {
+        AVL_to_output(a->fd, fichier);
     }
 }
 
@@ -308,7 +301,15 @@ int main() {
     }
     afficherAVL(avl, hauteur);
 
-    AVL_to_output(avl);
+
+    FILE * output = NULL;
+    output = fopen("tmp/output.csv", "w");
+    if (output == NULL) {
+        printf("Impossible d'ouvrir le fichier output.dat");
+        exit(1);
+    }
+    AVL_to_output(avl, output);
+    fclose(output);
 
     liberation_avl(avl); //libération de l'avl
     return 0;
