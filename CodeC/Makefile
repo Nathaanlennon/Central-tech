@@ -33,6 +33,3 @@ clean:
 .PHONY: build
 build: $(TARGET)
 
-.PHONY: run
-run: build
-	 ./$(TARGET)
