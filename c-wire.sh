@@ -327,10 +327,13 @@ if [ -e lv_all$nomCentrale.csv ];then
     sort -t':' -k3 -n tmp/output.csv > tmp/tri.csv
     awk '{print $0}' tmp/tri.csv  >> lv_all$nomCentrale.csv
     touch tmp/lv_all_mm$nomCentrale.csv
-    head lv_all$nomCentrale.csv > tmp/lv_all_mm$nomCentrale.csv
-    tail lv_all$nomCentrale.csv >> tmp/lv_all_mm$nomCentrale.csv
-    sed -i "1d" tmp/lv_all_mm$nomCentrale.csv
-    awk -F':' '{if ($2 != 0) print $0 ":" $2-$3}' tmp/lv_all_mm$nomCentrale.csv | sort -t ':' -k4 -n | cut -d':' -f1-3 >> lv_all_minmax$nomCentrale.csv
+    head tmp/tri.csv > tmp/lv_all_mm$nomCentrale.csv
+    tail tmp/tri.csv >> tmp/lv_all_mm$nomCentrale.csv
+    touch tmp/donnees_graph.csv
+    awk -F':' '{if ($2 != 0) print $0 ":" $2-$3}' tmp/lv_all_mm$nomCentrale.csv | sort -t ':' -k4 -n > tmp/donnees_graph.csv
+    echo "Min and Max 'capacity-load' extreme nodes" > lv_all_minmax$nomCentrale.csv
+    echo "Station LV:Capacité:Consommation (tous)" >> lv_all_minmax$nomCentrale.csv
+    cut -d':' -f1-3 tmp/donnees_graph.csv >> lv_all_minmax$nomCentrale.csv
 fi
 if [ -e lv_indiv$nomCentrale.csv ];then
     touch tmp/tri.csv
