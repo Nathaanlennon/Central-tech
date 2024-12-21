@@ -1,6 +1,7 @@
 #!/bin/bash
 Avant=$SECONDS
 param_present=0
+current_date=$(date +"%Y%m%d%H%M%S")
 #fonction d'aide
 h () {
     echo -e "
@@ -39,7 +40,6 @@ fi
 
 #deplace les anciens resultats dans tests
 if [ -e tmp/stockNom ];then
-    current_date=$(date +"%Y%m%d%H%M%S")
     fichier=$(cat tmp/stockNom)
     base_fichier=$(basename "$fichier" .csv)
     ancienTest=$base_fichier"_"$current_date
@@ -48,7 +48,6 @@ fi
 
 #deplace les anciens resultats dans tests pour "lv_minmax"
 if [ -e tmp/stockNom2 ];then
-    current_date=$(date +"%Y%m%d%H%M%S")
     fichier=$(cat tmp/stockNom2)
     base_fichier=$(basename "$fichier" .csv)
     ancienTest=$base_fichier"_"$current_date
@@ -113,13 +112,6 @@ fi
 #vérifie si le dossier graphs existe, le crée sinon
 if [ -d graphs ]; then
     echo "Le dossier graph existe"
-    #vérifie si graphs est vide
-    if [ "$(ls -A graphs)" ]; then
-        echo "rénitialisation du dossier..."
-        rm -r graphs/*
-    else
-        echo "le dossier est déjà vide"
-    fi
 else
     echo "Création du dossier graphs..."
     mkdir graphs
@@ -204,6 +196,7 @@ elif [ $2 == "lv" ]; then
         echo "lv_all$nomCentrale.csv" > tmp/stockNom
         touch tmp/stockNom2
         echo "lv_all_minmax$nomCentrale.csv" > tmp/stockNom2
+        mv graphs/graph_actuel.png graphs/graph_$nomCentrale$current_date.png
     fi
 fi
 
@@ -269,6 +262,7 @@ else
         }' tmp/temp.dat > tmp/temp2.dat
     fi
 fi
+
 #transforme les tiret en 0 pour faciliter la tache a la partie C
 tr '-' '0' < tmp/temp2.dat > tmp/input.dat
 
@@ -283,7 +277,6 @@ else
     echo "Durée du script : 0 secondes"
     exit 8
 fi
-
 
 #vérifie si l'executable existe
 cd CodeC
@@ -334,6 +327,7 @@ if [ -e lv_all$nomCentrale.csv ];then
     echo "Min and Max 'capacity-load' extreme nodes" > lv_all_minmax$nomCentrale.csv
     echo "Station LV:Capacité:Consommation (tous)" >> lv_all_minmax$nomCentrale.csv
     cut -d':' -f1-3 tmp/donnees_graph.csv >> lv_all_minmax$nomCentrale.csv
+    gnuplot graph.gnuplot
 fi
 if [ -e lv_indiv$nomCentrale.csv ];then
     touch tmp/tri.csv
@@ -347,5 +341,4 @@ if [ -e lv_comp$nomCentrale.csv ];then
 fi
 
 TempsFinal=$(($Intervalle + $Intervalle2))
-
 echo "Durée du script total : $TempsFinal secondes"
