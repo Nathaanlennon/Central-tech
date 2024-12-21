@@ -12,7 +12,6 @@
 
 pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur){
     if(fichier == NULL){ //fichier null ou n'existe pas, rien à traiter*
-    	printf("saucisse\n");
         return NULL;
     }
     if(avl != NULL){ //si l'avl n'est pas nul, on le vide entièrement
@@ -31,27 +30,34 @@ pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur){
       	if (station_type != DEFAUT) { //on vérifie que le type n'est pas incorrect et qu'il s'agit bien d'une station, défaut veut dire que ce n'est pas une station
             if(avl != NULL){
         		if(station_type == avl->station->type){ //on vérifie si le type de station est bien le même que l'avl (le premier élément est choisit comme référence)
-                	printf("5\n");
                     station = creer_station(chaine);
                 	avl = insertionAVL(avl, station, hauteur);
         		}
             }
             else{
-				printf("2\n");
                 station = creer_station(chaine);
         		avl = insertionAVL(avl, station, hauteur);
             }
         } else{
             if(station == NULL){
-            	printf("3\n");
             	filtrage_ok = false;
                 if(fichier2 != NULL){
                 	fprintf(fichier2,"%lu;%lu;%lu;%lu;%lu;%lu;%lu;%lu\n", chaine[0], chaine[1], chaine[2], chaine[3], chaine[4], chaine[5], chaine[6], chaine[7]);
                 }
             }
             else if(chaine[station->type] == station->id){
-              	printf("4\n");
-				station->conso += chaine[7];
+              	switch(station->type){
+                  	case HVB:
+                	case HVA:
+                		if(chaine[5] == 0){
+                        	station->conso += chaine[7];
+                		}
+                        break;
+                    default:
+                      	station->conso += chaine[7];
+                      	break;
+              	}
+
             }
             else{
             	filtrage_ok = false;
@@ -61,10 +67,9 @@ pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur){
             }
         }
     }
-    printf("%d poule \n", filtrage_ok+ 5);
     if(filtrage_ok == false){
         if(avl != NULL){
-            printf("Tri lors du filtrage incorrect, compensation");
+            printf("Tri lors du filtrage incorrect, compensation\n");
             if(fichier2 == NULL){
                 printf("Impossibilité d'ouverture du fichier de sauvegarde des utilisateurs inconnus, perte de donnée possible\n");
             }
@@ -80,11 +85,8 @@ pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur){
                     unsigned long inconnus = 0;
                     FILE* fichier3 = NULL;
                     fichier3 = fopen("../tmp/utilisateurs_inconnus.csv", "w");
-                    printf("ok\n");
                     if(fichier3 != NULL){
-                      	printf("ta mère\n");
                         while(fscanf(fichier2, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4], &chaine[5], &chaine[6], &chaine[7]) != EOF){
-                            printf("%d monsieur\n", avl->station->type);
                         	pAVL avl_station = rechercheAVL(avl, chaine[avl->station->type]);
                             if(avl_station == NULL){
                             	if(chaine[avl->station->type] != 0){
@@ -93,18 +95,26 @@ pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur){
                             	}
 							}
                             else{
-                                avl_station->station->conso += chaine[7];
+                                switch(station->type){
+                  					case HVB:
+                					case HVA:
+                						if(chaine[5] == 0){
+                  					      	station->conso += chaine[7];
+                						}
+                  				     	break;
+                  					default:
+                      					station->conso += chaine[7];
+                      					break;
+              					}
                             }
                         }
 
                         fclose(fichier3);
                         if(inconnus != 0){
-                          	printf("lalala\n");
                             printf("%lu utilisateurs n'ont pas été traités, ils sont sauvegardés dans Central-Tech/tmp/utilisateurs_seuls.csv\n", inconnus);
                         }
                     }
                     else{
-                      	printf("aiaiaia\n");
                         while(fscanf(fichier2, "%ld;%ld;%ld;%ld;%ld;%ld;%ld;%ld", &chaine[0], &chaine[1], &chaine[2], &chaine[3], &chaine[4], &chaine[5], &chaine[6], &chaine[7]) != EOF){
                             pAVL avl_station = rechercheAVL(avl, chaine[avl->station->type]);
                             if(avl_station == NULL){

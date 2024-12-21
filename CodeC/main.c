@@ -55,7 +55,6 @@ int main() {
         printf("Impossible d'ouvrir le fichier input.dat\n");
         exit(1);
     }
-    afficherAVL(avl, hauteur);
     FILE * output = NULL;
     output = fopen("../tmp/output.csv", "w");
     if (output == NULL) {
