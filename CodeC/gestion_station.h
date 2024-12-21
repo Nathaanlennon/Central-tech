@@ -13,6 +13,8 @@
 
 #include "macro.h"
 
+enum type_station { DEFAUT, HVB, HVA, LV }; //defaut équivaut à nul, vide, etc
+
 typedef struct Station {
     unsigned long id;
     unsigned int type; // voir enum type_station

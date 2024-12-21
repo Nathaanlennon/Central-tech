@@ -9,6 +9,6 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-enum type_station { DEFAUT, HVB, HVA, LV }; //defaut équivaut à nul, vide, etc
+
 
 #endif //MACRO_H

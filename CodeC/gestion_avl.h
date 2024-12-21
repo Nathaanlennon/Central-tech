@@ -31,5 +31,6 @@ pAVL equilibrerAVL(pAVL a);
 pAVL insertionAVL(pAVL a, pStation station, int *h);
 pAVL rechercheAVL(pAVL a, unsigned long id);
 void liberation_avl(pAVL avl);
+void afficherAVL(pAVL nd, int niveau);
 
 #endif //GESTION_AVL_H

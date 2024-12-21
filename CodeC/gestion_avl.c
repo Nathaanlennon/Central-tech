@@ -113,20 +113,21 @@ pAVL insertionAVL(pAVL a, pStation station, int *h) {
     return a;
 }
 
+//une fonction qui recherche une station dans l'avl en fonction de son ID
 pAVL rechercheAVL(pAVL a, unsigned long id) {
-	if(a == NULL) {
+	if(a == NULL) { //si l'avl est null, on retourne donc null
     	return NULL;
 	}
-    if(a->station->id == id) {
+    if(a->station->id == id) { //la station est dans le noeud présent
     	return a;
     }
-    if(id < a->station->id) {
+    if(id < a->station->id) { //la station est dans le sous arbre gauche
     	return rechercheAVL(a->fg, id);
     }
-    if(id > a->station->id) {
+    if(id > a->station->id) { //la station est dasn le sous arbre droit
     	return rechercheAVL(a->fd, id);
     }
-    return NULL;
+    return NULL; //on retourne null si jamais
 }
 
 // libère tout l'avl
@@ -142,4 +143,27 @@ void liberation_avl(pAVL avl) {
     }
     free(avl->station);
     free(avl); //on libère le noeud actuel
+}
+
+// Affichage de l'arbre en mode horizontal
+void afficherAVL(pAVL nd, int niveau) {
+    if (nd == NULL) {
+        return;
+    }
+
+    // Affiche d'abord le sous-arbre droit (pour un effet visuel en "arbre")
+    afficherAVL(nd->fd, niveau + 1);
+
+    // Affiche le noeud actuel avec indentation
+    for (int i = 0; i < niveau; i++) {
+        printf("     "); // Ajoute des espaces pour indenter
+    }
+    printf("%lu "
+           "\x1B[0;34m"
+           "%d\n"
+           "\x1B[0m",
+           nd->station->id, nd->eq);
+
+    // Affiche ensuite le sous-arbre gauche
+    afficherAVL(nd->fg, niveau + 1);
 }

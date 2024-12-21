@@ -10,32 +10,6 @@
 #include "traitement.h"
 
 
-// Affichage de l'arbre en mode horizontal
-void afficherAVL(pAVL nd, int niveau) {
-    if (nd == NULL) {
-        return;
-    }
-
-    // Affiche d'abord le sous-arbre droit (pour un effet visuel en "arbre")
-    afficherAVL(nd->fd, niveau + 1);
-
-    // Affiche le noeud actuel avec indentation
-    for (int i = 0; i < niveau; i++) {
-        printf("     "); // Ajoute des espaces pour indenter
-    }
-    printf("%lu "
-           "\x1B[0;34m"
-           "%d\n"
-           "\x1B[0m",
-           nd->station->id, nd->eq);
-
-    // Affiche ensuite le sous-arbre gauche
-    afficherAVL(nd->fg, niveau + 1);
-}
-
-
-
-
 
 
 
