@@ -29,4 +29,10 @@ Le projet est divisé en deux parties : un script Shell pour filtrer et automati
 ainsi qu'un script C pour effectuer les calculs nécessaires.
 
 
+Membre du groupe :
 
+Bias Nathan    MI-03
+
+Cearic Ivan    MI-03
+
+Saidi Narymane MI-03 22401617
