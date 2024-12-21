@@ -6,7 +6,7 @@
 #include "macro.h"
 
 //Permet d'obtenir le type de la station que l'on crée et le retourne sous la forme d'un int, voir enum type_station
-unsigned int get_type_station(unsigned long chaine[8]) {
+unsigned int get_station_type(unsigned long chaine[8]) {
     if (chaine[4] != 0 || chaine[5] != 0) {
         //vérifie qu'il s'agit d'une station, retourne le type defaut donc erreur. Il s'agit donc probablement d'un consommateur
         return DEFAUT;
@@ -26,7 +26,7 @@ unsigned int get_type_station(unsigned long chaine[8]) {
 pStation creer_station(unsigned long chaine[8]) {
     pStation station = NULL;
     station = malloc(sizeof(Station)); //allocation mémoire en fonction de la taille de la structure
-    unsigned int type = get_type_station(chaine);
+    unsigned int type = get_station_type(chaine);
     switch (type) {
         case LV:
             station->id = chaine[3]; //récupère l'id dans la colone associée au type (pareil pour chaque cas du switch)

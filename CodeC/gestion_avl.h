@@ -21,7 +21,7 @@ typedef struct AVL {
     struct AVL *fd; // Pointeur vers le fils droit
 } AVL, *pAVL;
 
-void liberation_avl(pAVL avl);
+
 pAVL creerAVL(pStation station);
 pAVL rotationGauche(pAVL avl);
 pAVL rotationDroite(pAVL avl);
@@ -29,5 +29,7 @@ pAVL doubleRotationGauche(pAVL a);
 pAVL doubleRotationDroite(pAVL a);
 pAVL equilibrerAVL(pAVL a);
 pAVL insertionAVL(pAVL a, pStation station, int *h);
+pAVL rechercheAVL(pAVL a, unsigned long id);
+void liberation_avl(pAVL avl);
 
 #endif //GESTION_AVL_H

@@ -10,7 +10,8 @@
 #include <unistd.h>
 #include <ctype.h>
 #include "gestion_avl.h"
-pAVL traitement_input(FILE *fichier, pAVL avl, int *hauteur);
+
+pAVL traitement_input(FILE* fichier, pAVL avl, int *hauteur);
 void AVL_to_output(pAVL a, FILE* fichier);
 
 #endif //TRAITEMENT_H

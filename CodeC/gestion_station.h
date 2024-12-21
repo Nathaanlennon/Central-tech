@@ -20,7 +20,7 @@ typedef struct Station {
     unsigned long conso;
 } Station, *pStation;
 
-unsigned int get_type_station(unsigned long chaine[8]);
+unsigned int get_station_type(unsigned long chaine[8]);
 pStation creer_station(unsigned long chaine[8]);
 
 

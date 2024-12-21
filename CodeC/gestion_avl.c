@@ -5,20 +5,6 @@
 #include "gestion_avl.h"
 #include "macro.h"
 
-// libère tout l'avl
-void liberation_avl(pAVL avl) {
-    if (avl == NULL) {
-        return; // l'avl est déjà libéré, rien à faire
-    }
-    if (avl->fd != NULL) {
-        liberation_avl(avl->fd); //on libère le sous arbre droit
-    }
-    if (avl->fg != NULL) {
-        liberation_avl(avl->fg); //on libère le sous arbre gauche
-    }
-    free(avl->station);
-    free(avl); //on libère le noeud actuel
-}
 
 //crée un chainon d'avl en prenant en argument une station
 pAVL creerAVL(pStation station) {
@@ -125,4 +111,35 @@ pAVL insertionAVL(pAVL a, pStation station, int *h) {
         *h = (a->eq == 0) ? 0 : 1; // Mise à jour de la hauteur
     }
     return a;
+}
+
+pAVL rechercheAVL(pAVL a, unsigned long id) {
+	if(a == NULL) {
+    	return NULL;
+	}
+    if(a->station->id == id) {
+    	return a;
+    }
+    if(id < a->station->id) {
+    	return rechercheAVL(a->fg, id);
+    }
+    if(id > a->station->id) {
+    	return rechercheAVL(a->fd, id);
+    }
+    return NULL;
+}
+
+// libère tout l'avl
+void liberation_avl(pAVL avl) {
+    if (avl == NULL) {
+        return; // l'avl est déjà libéré, rien à faire
+    }
+    if (avl->fd != NULL) {
+        liberation_avl(avl->fd); //on libère le sous arbre droit
+    }
+    if (avl->fg != NULL) {
+        liberation_avl(avl->fg); //on libère le sous arbre gauche
+    }
+    free(avl->station);
+    free(avl); //on libère le noeud actuel
 }
