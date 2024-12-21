@@ -8,7 +8,7 @@ Arguments :
 3/ type de consommation 
 4/ identifiant de la central éléctrique
 
-`./c-wire.sh Input/[fichier d'entrée] [type_station, hvb, hva,l v] [type_consommation(indiv, comp, all] (id de la central electrique) `
+`./c-wire.sh Input/[fichier d'entrée] [type_station, hvb, hva, lv] [type_consommation(indiv, comp, all] (id de la central electrique) `
 
 exemple : 
 
