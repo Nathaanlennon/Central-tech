@@ -3,9 +3,13 @@
 Veillez à tout compiler comme ce qui suit :
 
 Arguments : 
+
 1/ fichier d'entrée 
+
 2/ type de station 
+
 3/ type de consommation 
+
 4/ identifiant de la central éléctrique
 
 `./c-wire.sh Input/[fichier d'entrée] [type_station, hvb, hva, lv] [type_consommation(indiv, comp, all] (id de la central electrique) `
